@@ -13,7 +13,7 @@ def load_config() -> dict:
     
 
 def save_json(data: List[Dict[str, Any]], site: Path, filename: str) -> None:
-    formatted_filename = filename.lower().replace(' ', '_').replace("/", "_").replace(",", "")
+    formatted_filename = filename.lower().replace(' ', '_').replace("/", "_").replace(",", "").replace(":", "")
     filename = f"{formatted_filename}.json"
     filepath = JSON_DIR / site / filename
     
