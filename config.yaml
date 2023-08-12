@@ -1,2 +1,3 @@
 # -- Настройки скрипта --
+save_ads: False
 debug: True
