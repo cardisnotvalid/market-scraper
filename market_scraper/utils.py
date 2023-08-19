@@ -1,23 +1,51 @@
-import json
+import os
 import yaml
-from pathlib import Path
-from typing import List, Dict, Any
+import asyncio
+import aiofiles
 
-from market_scraper.logger import logger
-from market_scraper.paths import CONFIG_PATH, JSON_DIR
+from market_scraper.paths import CONFIG_PATH, ANIBIS_DIR, OUT_DIR
 
 
 def load_config() -> dict:
     with open(CONFIG_PATH) as file:
         return yaml.load(file, Loader=yaml.FullLoader)
+
+
+def collect_files_to_one() -> None:
+    files = os.listdir(ANIBIS_DIR)
+    datas = []
+    for file in files:
+        filepath = ANIBIS_DIR / file
+        with open(filepath, encoding="utf-8") as file:
+            datas += file.read().split()
+    
+    datas = [data for data in datas if data.startswith("https")]
+
+    out_filename = "anibis.txt"
+    out_filepath = OUT_DIR / out_filename
+    with open(out_filepath, "a", encoding="utf-8") as file:
+        for data in datas:
+            file.write(data + "\n")
+
+
+async def clear_files() -> None:
+    files = os.listdir(ANIBIS_DIR)
+    
+    async def process_task(filepath):
+        async with aiofiles.open(filepath, "r", encoding="utf-8") as file:
+            text = list(set((await file.read()).split()))
+            
+        async with aiofiles.open(filepath, "w", encoding="utf-8") as file:
+            for line in text:
+                await file.write(line + "\n")
+    
+    tasks = [process_task(ANIBIS_DIR / file) for file in files]
+    await asyncio.gather(*tasks)
     
 
-def save_json(data: List[Dict[str, Any]], site: Path, filename: str) -> None:
-    formatted_filename = filename.lower().replace(' ', '_').replace("/", "_").replace(",", "").replace(":", "")
-    filename = f"{formatted_filename}.json"
-    filepath = JSON_DIR / site / filename
+async def save_ads(data: str, filename: str) -> None:
+    filename = f"{filename}.txt"
+    filepath = ANIBIS_DIR / filename
     
-    with open(filepath, "w", encoding="utf-8") as file:
-        json.dump(data, file, ensure_ascii=False, indent=4)
-        
-    logger.debug(f"Данные сохранены в файле {filename}")
+    async with aiofiles.open(filepath, mode="a") as file:
+        await file.write(data + "\n")
