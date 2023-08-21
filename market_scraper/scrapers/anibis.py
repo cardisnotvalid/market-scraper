@@ -115,15 +115,15 @@ class Anibis:
             async with self.semaphore:
                 return await self.fetch_ads_data(name, url)
         
-        collecting_tasks = [
-            asyncio.create_task(
-                task_collect_ads(
-                    category["name"], 
-                    category["languageUrls"]["fr"].split("/")[-1]
-                )
-            )
-            for category in all_categories
-        ]
+        collecting_tasks = []
+        for category in all_categories:
+            name = category.get("name")
+            if category.get("languageUrls").get("fr"):
+                url = category.get("languageUrls").get("fr").split("/")[-1]
+            else:
+                url = None
+            collecting_tasks.append(asyncio.create_task(task_collect_ads(name, url)))
+        
         all_ads_data = await asyncio.gather(*collecting_tasks)
         
         logger.info(f"[Anibis] Количество проверенных объявлений {len(all_ads_data)}")
