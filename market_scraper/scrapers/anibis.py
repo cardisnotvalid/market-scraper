@@ -6,7 +6,7 @@ from aiohttp import ClientSession, TCPConnector
 
 from typing import List, Dict, Tuple, Any
 from market_scraper.logger import logger
-from market_scraper.utils import save_ads
+from market_scraper.utils import save_ads, valid_response
 
 
 class Anibis:
@@ -142,7 +142,9 @@ class Anibis:
             url=f"{self.base_api_url}/search/listings", 
             params={"cun": cun, "fcun": cun, "pi": page, "pr": 1}
         ) as response:
-            return ((await response.json()).get("listings", []))
+            if await valid_response(response):
+                return ((await response.json()).get("listings", []))
+            return None
     
     async def fetch_ads_page_data(self, url: str, name: str) -> Dict[str, str] | None:
         response = await self.session.get(self.base_url + url)
