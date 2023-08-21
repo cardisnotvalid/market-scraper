@@ -3,6 +3,7 @@ seller_date: [20.05.2013, 20.08.2023]
 ads_date: [20.05.2013, 20.08.2023]
 ads_count: 1
 price: [0.0, 1000000.0]
+page_limit: 5
 
 # -- Currency --
 CHF: 106.68
