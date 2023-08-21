@@ -20,13 +20,15 @@ class Anibis:
         ads_date: List[str] = ("20.05.2013", "13.08.2023"),
         ads_count: int = 1, 
         price: List[float] = (0.0, 1000000.0),
-        chf_currency: float = 100.0
+        chf_currency: float = 100.0,
+        page_limit: int = None
     ) -> None:
         self.seller_date = self.convert_to_strptime(seller_date)
         self.ads_date = self.convert_to_strptime(ads_date)
         self.ads_count = ads_count
         self.price = price
         self.chf_currency = chf_currency
+        self.page_limit = page_limit
         
         self.connector = TCPConnector(verify_ssl=False)
         self.session = ClientSession(connector=self.connector)
@@ -83,8 +85,8 @@ class Anibis:
         # async def process_fetch_ads_listings(cun, page):
         #     async with self.semaphore:
         #         return await self.fetch_ads_listings(cun, page)
-                
-        last_page = await self.get_last_page(cun)
+        
+        last_page =  self.page_limit if self.page_limit else await self.get_last_page(cun)
         ads_listings_tasks = [
             asyncio.create_task(self.fetch_ads_listings(cun, page)) 
             for page in range(1, last_page + 1)
@@ -111,7 +113,6 @@ class Anibis:
         
         async def task_collect_ads(name, url):
             async with self.semaphore:
-                logger.debug(f"[Anibis] Категория: {name}")
                 return await self.fetch_ads_data(name, url)
         
         collecting_tasks = [
