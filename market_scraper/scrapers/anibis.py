@@ -101,12 +101,12 @@ class Anibis:
         #         return await self.fetch_ads_page_data(url)
         
         ads_data_tasks = [
-            asyncio.create_task(self.fetch_ads_page_data(ads["url"], ads["category"]["name"]))
+            asyncio.create_task(self.fetch_ads_page_data(ads.get("url"), ads.get("category").get("name")))
             for ads in ads_listings_result
         ]
         ads_data_list = await asyncio.gather(*ads_data_tasks)
 
-        logger.debug(f"[Anibis] Проверено {name}: {sum(len(item) for item in ads_data_list if item)}")
+        logger.debug(f"[Anibis] Проверено {name}: {len(ads_data_list)}")
     
     async def collect_all_ads(self, all_categories: List[str]):
         logger.info("[Anibis] Процесс получение всех объявлений")
@@ -191,6 +191,21 @@ class Anibis:
         ads_date = datetime.strptime(ads_date, "%d.%m.%Y")
         seller_date = datetime.strptime(seller_date, "%d.%m.%Y")
         
+        # print(
+        #     f"{self.seller_date[0]} <= {seller_date} <= {self.seller_date[1]} | "
+        #     f"{self.ads_date[0]} <= {ads_date} <= {self.ads_date[1]} | "
+        #     f"{self.ads_count} <= {ads_count} | "
+        #     f"{self.price[0]} <= {price * self.chf_currency} <= {self.price[1]}"
+        # )
+        
+        # print(
+        #     "Отсортирован:",
+        #     self.seller_date[0] <= seller_date <= self.seller_date[1],
+        #     self.ads_date[0] <= ads_date <= self.ads_date[1],
+        #     self.ads_count <= ads_count,
+        #     self.price[0] <= price * self.chf_currency <= self.price[1]
+        # )
+                
         return all([
             self.seller_date[0] <= seller_date <= self.seller_date[1],
             self.ads_date[0] <= ads_date <= self.ads_date[1],
