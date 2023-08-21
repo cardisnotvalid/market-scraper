@@ -14,12 +14,14 @@ async def main():
     ads_count = config["ads_count"]
     price = config["price"]
     chf_currency = config["CHF"]
+    page_limit = config["page_limit"]
     
     logger.info(f"Регистрация продавца: {seller_date[0]} - {seller_date[1]}")
     logger.info(f"{'Дата объявления:':<21} {ads_date[0]} - {ads_date[1]}")
     logger.info(f"{'Кол-во объявлений:':<21} {ads_count}")
     logger.info(f"{'Диапазон цен:':<21} {price[0]} - {price[1]}₽")
-    logger.info(f"{'Курс валюты CHF:':<21} {chf_currency}₽\n")
+    logger.info(f"{'Курс валюты CHF:':<21} {chf_currency}₽")
+    logger.info(f"{'Лимит страниц:':<21} {page_limit}\n")
     
     try:
         async with Anibis(
@@ -28,7 +30,8 @@ async def main():
             ads_date=ads_date,
             ads_count=ads_count,
             price=price,
-            chf_currency=chf_currency
+            chf_currency=chf_currency,
+            page_limit=page_limit
         ) as anibis:
             all_categories = await anibis.get_all_categories()
             await anibis.collect_all_ads(all_categories)
