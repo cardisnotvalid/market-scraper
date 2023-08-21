@@ -1,5 +1,6 @@
 import os
 import yaml
+import string
 import asyncio
 import aiofiles
 
@@ -28,6 +29,13 @@ def collect_files_to_one() -> None:
             file.write(data + "\n")
 
 
+
+def sanitize_filename(filename: str) -> str:
+    valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+    sanitized_filename = ''.join(c for c in filename if c in valid_chars)
+    return sanitized_filename
+
+
 async def clear_files() -> None:
     files = os.listdir(ANIBIS_DIR)
     
@@ -44,7 +52,7 @@ async def clear_files() -> None:
     
 
 async def save_ads(data: str, filename: str) -> None:
-    filename = f"{filename}.txt"
+    filename = sanitize_filename(f"{filename.strip()}.txt")
     filepath = ANIBIS_DIR / filename
     
     async with aiofiles.open(filepath, mode="a") as file:
