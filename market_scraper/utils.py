@@ -49,3 +49,10 @@ async def save_ads(data: str, filename: str) -> None:
     
     async with aiofiles.open(filepath, mode="a") as file:
         await file.write(data + "\n")
+        
+
+async def valid_response(response) -> bool:
+    if response.status in [200, 201, 204]:
+        return True
+    else:
+        return False
