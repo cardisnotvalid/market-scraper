@@ -138,12 +138,15 @@ class Anibis:
             return (await response.json())["pagingInfo"]["totalItems"] // 20 + 1
     
     async def fetch_ads_listings(self, cun: str, page: int) -> List[Dict[str, Any]]:
-        async with self.session.get(
-            url=f"{self.base_api_url}/search/listings", 
-            params={"cun": cun, "fcun": cun, "pi": page, "pr": 1}
-        ) as response:
-            if await valid_response(response):
-                return ((await response.json()).get("listings", []))
+        try:
+            async with self.session.get(
+                url=f"{self.base_api_url}/search/listings", 
+                params={"cun": cun, "fcun": cun, "pi": page, "pr": 1}
+            ) as response:
+                if await valid_response(response):
+                    return ((await response.json()).get("listings", []))
+                return None
+        except:
             return None
     
     async def fetch_ads_page_data(self, url: str, name: str) -> Dict[str, str] | None:
