@@ -111,6 +111,7 @@ class Anibis:
         
         async def task_collect_ads(name, url):
             async with self.semaphore:
+                logger.debug(f"[Anibis] Категория: {name}")
                 return await self.fetch_ads_data(name, url)
         
         collecting_tasks = [
