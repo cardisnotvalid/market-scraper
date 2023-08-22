@@ -92,7 +92,7 @@ class Anibis:
             for page in range(1, last_page + 1)
         ]
         ads_listings_list = await asyncio.gather(*ads_listings_tasks)
-        ads_listings_result = [item for sublist in ads_listings_list for item in sublist if item]
+        ads_listings_result = [item for sublist in ads_listings_list if sublist for item in sublist if item]
 
         with open("data.txt", "w", encoding="utf-8") as file:
             file.write(str(ads_listings_list))
