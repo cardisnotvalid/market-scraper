@@ -107,15 +107,11 @@ class Anibis:
         for ads in ads_listings_result:
             if ads is not None:
                 url = ads.get("url")
-                name_ = ads.get("category").get("name")
-            
-                if url is None or name_ is None:
-                    continue
-                else:
+                category = ads.get("category")
+                if url is not None and category is not None:
+                    name_ = category.get("name")
                     task = asyncio.create_task(self.fetch_ads_page_data(url, name_))
                     ads_data_tasks.append(task)
-            else:
-                continue
         
         ads_data_list = await asyncio.gather(*ads_data_tasks)
 
