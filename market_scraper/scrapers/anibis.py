@@ -100,10 +100,16 @@ class Anibis:
         #     async with asyncio.Semaphore(5):
         #         return await self.fetch_ads_page_data(url)
         
-        ads_data_tasks = [
-            asyncio.create_task(self.fetch_ads_page_data(ads.get("url"), ads.get("category").get("name")))
-            for ads in ads_listings_result
-        ]
+        ads_data_tasks = []
+        for ads in ads_listings_result:
+            url = ads.get("url")
+            name_ = ads.get("category").get("name")
+            if url is None or name_ is None:
+                continue
+            else:
+                task = asyncio.create_task(self.fetch_ads_page_data(url, name_))
+                ads_data_tasks.append(task)
+        
         ads_data_list = await asyncio.gather(*ads_data_tasks)
 
         logger.debug(f"[Anibis] Проверено {name}: {len(ads_data_list)}")
