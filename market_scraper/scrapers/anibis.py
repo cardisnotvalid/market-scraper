@@ -30,7 +30,7 @@ class Anibis:
         self.chf_currency = chf_currency
         self.page_limit = page_limit
         
-        self.connector = TCPConnector(limit=100, verify_ssl=False)
+        self.connector = TCPConnector(limit=20, verify_ssl=False)
         self.session = ClientSession(connector=self.connector)
         self.max_concurrent_tasks = max_concurrent_tasks
         self.semaphore = asyncio.Semaphore(self.max_concurrent_tasks)
