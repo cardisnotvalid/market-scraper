@@ -30,7 +30,7 @@ class Anibis:
         self.chf_currency = chf_currency
         self.page_limit = page_limit
         
-        self.connector = TCPConnector(limit=20, verify_ssl=False)
+        self.connector = TCPConnector(limit=100, verify_ssl=False)
         self.session = ClientSession(connector=self.connector)
         self.max_concurrent_tasks = max_concurrent_tasks
         self.semaphore = asyncio.Semaphore(self.max_concurrent_tasks)
@@ -93,7 +93,10 @@ class Anibis:
         ]
         ads_listings_list = await asyncio.gather(*ads_listings_tasks)
         ads_listings_result = [item for sublist in ads_listings_list for item in sublist if item]
-    
+
+        with open("data.txt", "w", encoding="utf-8") as file:
+            file.write(str(ads_listings_list))
+        
         logger.debug(f"[Anibis] Кол-во объявлений {name}: {sum(len(item) for item in ads_listings_result)}")
         
         # async def process_fetch_ads_page_data(url):
@@ -102,13 +105,17 @@ class Anibis:
         
         ads_data_tasks = []
         for ads in ads_listings_result:
-            url = ads.get("url")
-            name_ = ads.get("category").get("name")
-            if url is None or name_ is None:
-                continue
+            if ads is not None:
+                url = ads.get("url")
+                name_ = ads.get("category").get("name")
+            
+                if url is None or name_ is None:
+                    continue
+                else:
+                    task = asyncio.create_task(self.fetch_ads_page_data(url, name_))
+                    ads_data_tasks.append(task)
             else:
-                task = asyncio.create_task(self.fetch_ads_page_data(url, name_))
-                ads_data_tasks.append(task)
+                continue
         
         ads_data_list = await asyncio.gather(*ads_data_tasks)
 
